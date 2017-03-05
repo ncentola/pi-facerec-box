@@ -25,6 +25,7 @@ class OpenCVCapture(object):
 		# Capture a frame from the camera.
 		data = io.BytesIO()
 		with picamera.PiCamera() as camera:
+			camera.resolution = (240, 240)
 			camera.capture(data, format='jpeg')
 		data = np.fromstring(data.getvalue(), dtype=np.uint8)
 		# Decode the image data and return an OpenCV image.
@@ -32,4 +33,5 @@ class OpenCVCapture(object):
 		# Save captured image for debugging.
 		cv2.imwrite(config.DEBUG_IMAGE, image)
 		# Return the captured image data.
+		# print 'picam.py'
 		return image

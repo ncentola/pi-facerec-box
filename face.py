@@ -21,9 +21,10 @@ def detect_single(image):
 				minNeighbors=config.HAAR_MIN_NEIGHBORS, 
 				minSize=config.HAAR_MIN_SIZE, 
 				flags=cv2.CASCADE_SCALE_IMAGE)
-	if len(faces) != 1:
-		return None
-	return faces[0]
+	#print 'detect faces'
+	#if len(faces) != 1:
+	#	return None
+	return faces
 
 def crop(image, x, y, w, h):
 	"""Crop box defined by x, y (upper left corner) and w, h (width and height)
