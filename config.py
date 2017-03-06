@@ -32,9 +32,8 @@ POSITIVE_THRESHOLD = 2000.0
 # File to save and load face recognizer model.
 TRAINING_FILE = 'training.xml'
 
-# Directories which contain the positive and negative training image data.
-POSITIVE_DIR = './training/positive'
-NEGATIVE_DIR = './training/negative'
+# Directories which contain the training image data.
+FACES_DIR = '/home/pi/faces/'
 
 # Value for positive and negative labels passed to face recognition model.
 # Can be any integer values, but must be unique from each other.
