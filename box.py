@@ -1,7 +1,7 @@
-"""Raspberry Pi Face Recognition Treasure Box
-Treasure Box Script
-Copyright 2013 Tony DiCola 
-"""
+#"""Raspberry Pi Face Recognition Treasure Box
+#Treasure Box Script
+#Copyright 2013 Tony DiCola 
+#"""
 import cv2
 
 import config
@@ -11,10 +11,10 @@ import hardware
 
 if __name__ == '__main__':
 	# Load training data into model
-	#print 'Loading training data...'
-	#model = cv2.createEigenFaceRecognizer()
-	#model.load(config.TRAINING_FILE)
-	#print 'Training data loaded!'
+	print 'Loading training data...'
+	model = cv2.createEigenFaceRecognizer()
+	model.load(config.TRAINING_FILE)
+	print 'Training data loaded!'
 	# Initialize camer and box.
 	camera = config.get_camera()
 	#box = hardware.Box()
@@ -33,21 +33,30 @@ if __name__ == '__main__':
 		#	print len(faces)
 		#else:
 		#	print 'no faces'
+		cv2.imshow('Frame', image)
+                cv2.waitKey(1) & 0xFF
+
 		if faces is not None:
 			for (x, y, w, h) in faces:
         	               	cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
-		cv2.imshow('Frame', image)
-		cv2.waitKey(1) & 0xFF
 
-		#if result is None:
-		#	print 'Could not detect single face!  Check the image in capture.pgm' \
-		#		  ' to see what was captured and try again with only one face visible.'
-		#	continue
-		#x, y, w, h = result
-		## Crop and resize image to face.
-		#crop = face.resize(face.crop(image, x, y, w, h))
-		## Test face against model.
-		#label, confidence = model.predict(crop)
+		if faces is None:
+			print 'Could not detect single face!  Check the image in capture.pgm' \
+				  ' to see what was captured and try again with only one face visible.'
+			continue
+		else:
+			for facez in faces:
+				x, y, w, h = facez
+				## Crop and resize image to face.
+				crop = face.resize(face.crop(image, x, y, w, h))
+				## Test face against model.
+		
+				label, confidence = model.predict(crop)
+				print label
+				print confidence
+
+
+	
 		#print 'Predicted {0} face with confidence {1} (lower is more confident).'.format(
 		#	'POSITIVE' if label == config.POSITIVE_LABEL else 'NEGATIVE', 
 		#	confidence)
