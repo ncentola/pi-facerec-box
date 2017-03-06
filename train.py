@@ -61,22 +61,27 @@ if __name__ == '__main__':
 	faces_count = 0
 
 	dir_id = 0
-	id_name_lookup = ()	
+	id_name_lookup = []	
 
 	# Read all faces
 	for root, dirs, files in os.walk(config.FACES_DIR):
 		for dir in dirs:
-			
+			id_name_lookup.append((dir_id, dir)) 
 			for file in os.listdir(os.path.join(root, dir)):
 				filename = os.path.join(root, dir, file)
-				print filename
-				print type(dir)
 				faces.append(prepare_image(filename))
-				labels.append(dir)
+				labels.append(dir_id)
 				faces_count = faces_count + 1
 			
 			dir_id = dir_id + 1
-	
+	import csv
+
+	with open('id_name_lookup.csv', 'wb') as myfile:
+    		wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+    		wr.writerow(['dir_id', 'name'])
+		for row in id_name_lookup:
+			wr.writerow(row)
+
 	print 'Read', faces_count, 'images.'
 
 	# Train model
