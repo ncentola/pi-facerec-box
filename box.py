@@ -25,7 +25,7 @@ if __name__ == '__main__':
 		# Convert image to grayscale.
 		image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 		# Get coordinates of single face in captured image.
-		faces = face.detect_single(image)
+		faces = face.detect_face(image, single = False)
 		#if faces is not None:
         	#        for (x, y, w, h) in faces:
 		#		cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
