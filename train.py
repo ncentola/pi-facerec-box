@@ -58,19 +58,26 @@ if __name__ == '__main__':
 	print "Reading training images..."
 	faces = []
 	labels = []
-	pos_count = 0
-	neg_count = 0
-	# Read all positive images
-	for filename in walk_files(config.POSITIVE_DIR, '*.pgm'):
-		faces.append(prepare_image(filename))
-		labels.append(config.POSITIVE_LABEL)
-		pos_count += 1
-	# Read all negative images
-	for filename in walk_files(config.NEGATIVE_DIR, '*.pgm'):
-		faces.append(prepare_image(filename))
-		labels.append(config.NEGATIVE_LABEL)
-		neg_count += 1
-	print 'Read', pos_count, 'positive images and', neg_count, 'negative images.'
+	faces_count = 0
+
+	dir_id = 0
+	id_name_lookup = ()	
+
+	# Read all faces
+	for root, dirs, files in os.walk(config.FACES_DIR):
+		for dir in dirs:
+			
+			for file in os.listdir(os.path.join(root, dir)):
+				filename = os.path.join(root, dir, file)
+				print filename
+				print type(dir)
+				faces.append(prepare_image(filename))
+				labels.append(dir)
+				faces_count = faces_count + 1
+			
+			dir_id = dir_id + 1
+	
+	print 'Read', faces_count, 'images.'
 
 	# Train model
 	print 'Training model...'
@@ -87,5 +94,5 @@ if __name__ == '__main__':
 	eigenvectors = model.getMat("eigenvectors")
 	pos_eigenvector = eigenvectors[:,0].reshape(faces[0].shape)
 	cv2.imwrite(POSITIVE_EIGENFACE_FILE, normalize(pos_eigenvector, 0, 255, dtype=np.uint8))
-	neg_eigenvector = eigenvectors[:,1].reshape(faces[0].shape)
-	cv2.imwrite(NEGATIVE_EIGENFACE_FILE, normalize(neg_eigenvector, 0, 255, dtype=np.uint8))
+	#neg_eigenvector = eigenvectors[:,1].reshape(faces[0].shape)
+	#cv2.imwrite(NEGATIVE_EIGENFACE_FILE, normalize(neg_eigenvector, 0, 255, dtype=np.uint8))
