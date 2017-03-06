@@ -12,7 +12,7 @@ import config
 haar_faces = cv2.CascadeClassifier(config.HAAR_FACES)
 
 
-def detect_single(image):
+def detect_face(image, single = False):
 	"""Return bounds (x, y, width, height) of detected face in grayscale image.
 	   If no face or more than one face are detected, None is returned.
 	"""
@@ -22,8 +22,8 @@ def detect_single(image):
 				minSize=config.HAAR_MIN_SIZE, 
 				flags=cv2.CASCADE_SCALE_IMAGE)
 	#print 'detect faces'
-	#if len(faces) != 1:
-	#	return None
+	if single and len(faces) != 1:
+		return None
 	return faces
 
 def crop(image, x, y, w, h):
