@@ -3,7 +3,7 @@
 #Copyright 2013 Tony DiCola 
 #"""
 import cv2
-
+import csv
 import config
 import face
 import hardware
@@ -17,8 +17,10 @@ if __name__ == '__main__':
 	print 'Training data loaded!'
 	# Initialize camer and box.
 	camera = config.get_camera()
-	#box = hardware.Box()
-	# Move box to locked position.
+	# read in id/label lookup table
+	x = open('id_name_lookup.csv')
+	id_name_lookup = csv.reader(x)
+	print id_name_lookup
 	
 	while True:
 		image = camera.read()
