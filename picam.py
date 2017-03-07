@@ -31,7 +31,7 @@ class OpenCVCapture(object):
 		# Decode the image data and return an OpenCV image.
 		image = cv2.imdecode(data, 1)
 		# Save captured image for debugging.
-		cv2.imwrite(config.DEBUG_IMAGE, image)
+		#cv2.imwrite(config.DEBUG_IMAGE, image)
 		# Return the captured image data.
 		# print 'picam.py'
 		return image
