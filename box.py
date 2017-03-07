@@ -18,8 +18,8 @@ if __name__ == '__main__':
 	# Initialize camer and box.
 	camera = config.get_camera()
 	# read in id/label lookup table
-	x = open('id_name_lookup.csv')
-	id_name_lookup = csv.reader(x)
+	id_name_lookup = list(csv.reader(open('id_name_lookup.csv')))
+	#id_name_lookup = csv.reader(x)
 	print id_name_lookup
 	
 	while True:
@@ -35,18 +35,12 @@ if __name__ == '__main__':
 		#	print len(faces)
 		#else:
 		#	print 'no faces'
-		cv2.imshow('Frame', image)
-                cv2.waitKey(1) & 0xFF
+		if faces is not None:
+                        for (x, y, w, h) in faces:
+                                cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
+
 
 		if faces is not None:
-			for (x, y, w, h) in faces:
-        	               	cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
-
-		if faces is None:
-			print 'Could not detect single face!  Check the image in capture.pgm' \
-				  ' to see what was captured and try again with only one face visible.'
-			continue
-		else:
 			for facez in faces:
 				x, y, w, h = facez
 				## Crop and resize image to face.
@@ -54,8 +48,17 @@ if __name__ == '__main__':
 				## Test face against model.
 		
 				label, confidence = model.predict(crop)
+				name = 'not working'
+				for row in id_name_lookup:
+					if row[0] == str(label):
+						name = row[1]
+				cv2.putText(image, name, (x, y+h+20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 2)
 				print label
+				print name
 				print confidence
+				#x.seek(0)
+                cv2.imshow('Frame', image)
+                cv2.waitKey(1) & 0xFF
 
 
 	
