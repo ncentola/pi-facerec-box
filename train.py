@@ -17,6 +17,9 @@ import numpy as np
 import config
 import face
 
+import pandas as pd
+from sqlalchemy import create_engine
+
 
 MEAN_FILE = 'mean.png'
 POSITIVE_EIGENFACE_FILE = 'positive_eigenface.png'
@@ -62,20 +65,46 @@ if __name__ == '__main__':
 
 	dir_id = 0
 	id_name_lookup = []	
+	
+	engine = create_engine('postgres://pi:Good4now@localhost:5432/pi')	
+	#query to find all people not already in users
+	if engine.dialect.has_table(engine, 'users'):
+		users = pd.read_sql('users', engine)	
+		dir_id = users['id'].max() + 1
+		user_names = list(pd.Series(users['name']))
+	else:
+		dir_id = 0
+		user_names = []
+		dummy_data = [(9999, 'blah')]
+		users = pd.DataFrame.from_records(dummy_data, columns = ['id', 'name'])
 
 	# Read all faces
 	for root, dirs, files in os.walk(config.FACES_DIR):
 		for dir in dirs:
-			id_name_lookup.append((dir_id, dir)) 
-			for file in os.listdir(os.path.join(root, dir)):
-				filename = os.path.join(root, dir, file)
-				faces.append(prepare_image(filename))
-				labels.append(dir_id)
-				faces_count = faces_count + 1
-			
-			dir_id = dir_id + 1
-	import csv
+			if dir in user_names:
+				print 'test'
+				existing_id = int(users['id'].loc[users['name'] == dir])
+				id_name_lookup.append((existing_id, dir))
+				for file in os.listdir(os.path.join(root, dir)):
+                                	filename = os.path.join(root, dir, file)
+                                	faces.append(prepare_image(filename))
+                                	labels.append(existing_id)
+                                	faces_count = faces_count + 1
 
+			else:
+				id_name_lookup.append((dir_id, dir)) 
+				for file in os.listdir(os.path.join(root, dir)):
+					filename = os.path.join(root, dir, file)
+					faces.append(prepare_image(filename))
+					labels.append(dir_id)
+					faces_count = faces_count + 1
+				dir_id = dir_id + 1
+	
+	import csv
+	df = pd.DataFrame.from_records(id_name_lookup, columns = ['id', 'name'])
+	df_new = df.loc[~df['name'].isin(users['name'])]
+	print 'Writing ' + str(len(df_new.index)) + ' rows.'
+	df_new.to_sql('users', engine, if_exists = 'append')
 	with open('id_name_lookup.csv', 'wb') as myfile:
     		wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
     		wr.writerow(['dir_id', 'name'])
