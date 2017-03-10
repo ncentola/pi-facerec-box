@@ -3,11 +3,10 @@
 #Copyright 2013 Tony DiCola 
 #"""
 import cv2
-import csv
 import config
 import face
 import hardware
-
+from sqlalchemy import create_engine
 
 if __name__ == '__main__':
 	# Load training data into model
@@ -15,13 +14,14 @@ if __name__ == '__main__':
 	model = cv2.createEigenFaceRecognizer()
 	model.load(config.TRAINING_FILE)
 	print 'Training data loaded!'
+	
 	# Initialize camer and box.
 	camera = config.get_camera()
-	# read in id/label lookup table
-	id_name_lookup = list(csv.reader(open('id_name_lookup.csv')))
-	#id_name_lookup = csv.reader(x)
-	print id_name_lookup
 	
+	# read in users lookup table
+	engine = create_engine('postgres://pi@localhost:5432/pi')
+	users = pd.read_sql('users', engine)
+
 	while True:
 		image = camera.read()
 		# Convert image to grayscale.
@@ -47,16 +47,14 @@ if __name__ == '__main__':
 				crop = face.resize(face.crop(image, x, y, w, h))
 				## Test face against model.
 		
-				label, confidence = model.predict(crop)
+				id, confidence = model.predict(crop)
 				name = 'not working'
-				for row in id_name_lookup:
-					if row[0] == str(label):
-						name = row[1]
+				name = users['name'].loc[users['id'] == id]
+				
 				cv2.putText(image, name, (x, y+h+20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 2)
-				print label
 				print name
 				print confidence
-				#x.seek(0)
+				
                 cv2.imshow('Frame', image)
                 cv2.waitKey(1) & 0xFF
 
