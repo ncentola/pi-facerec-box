@@ -7,6 +7,7 @@ import config
 import face
 import hardware
 from sqlalchemy import create_engine
+import pandas as pd
 
 if __name__ == '__main__':
 	# Load training data into model
@@ -26,31 +27,29 @@ if __name__ == '__main__':
 		image = camera.read()
 		# Convert image to grayscale.
 		image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+		
 		# Get coordinates of single face in captured image.
 		faces = face.detect_face(image, single = False)
-		#if faces is not None:
-        	#        for (x, y, w, h) in faces:
-		#		cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
-		#if faces is not None:
-		#	print len(faces)
-		#else:
-		#	print 'no faces'
+		
 		if faces is not None:
                         for (x, y, w, h) in faces:
                                 cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
 
 
 		if faces is not None:
+			
 			for facez in faces:
 				x, y, w, h = facez
+				
 				## Crop and resize image to face.
 				crop = face.resize(face.crop(image, x, y, w, h))
+				
 				## Test face against model.
-		
 				id, confidence = model.predict(crop)
 				name = 'not working'
 				name = users['name'].loc[users['id'] == id]
 				
+				cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
 				cv2.putText(image, name, (x, y+h+20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 2)
 				print name
 				print confidence
