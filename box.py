@@ -8,6 +8,31 @@ import face
 import hardware
 from sqlalchemy import create_engine
 import pandas as pd
+import pigpio
+import RPi.GPIO as GPIO
+import time
+
+GPIO.setmode(GPIO.BCM)
+
+GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(22, GPIO.OUT)
+pi = pigpio.pi()
+#p = GPIO.PWM(22, 50)
+#p.start(7.5)
+
+def dispense(id, name, confidence):
+        print 'Dispensing for ' + name
+        #GPIO.output(22, 1)
+        #time.sleep(0.0015)
+        #GPIO.output(22, 0)
+        #time.sleep(2)
+        pi.set_servo_pulsewidth(22, 1000)
+        time.sleep(0.5) # sleep 1 second
+        pi.set_servo_pulsewidth(22, 1500)
+        time.sleep(0.5) # sleep 1 second
+
+def is_button_pressed():
+	return GPIO.input(18)
 
 if __name__ == '__main__':
 	# Load training data into model
@@ -46,11 +71,18 @@ if __name__ == '__main__':
 				
 				## Test face against model.
 				id, confidence = model.predict(crop)
-				name = 'not working'
-				name = str(users['name'].loc[users['id'] == id][1])
+				
+				name = str(users['name'].loc[users['id'] == id])
 				
 				cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
 				cv2.putText(image, name, (x, y+h+20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 2)
+				try:
+					print(is_button_pressed())
+					if not is_button_pressed():
+						dispense(id, name, confidence)
+				except KeyboardInterrupt:
+					pi.stop()
+					GPIO.cleanup()		
 				print name
 				print confidence
 				
