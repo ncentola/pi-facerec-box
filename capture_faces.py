@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	camera = config.get_camera()
 	#box = hardware.Box()
 	
-	folder_path = os.path.join('/home/pi/faces/', person_name) 
+	folder_path = os.path.join(config.FACES_DIR, person_name) 
 	# Create the directory for positive training images if it doesn't exist.
 	if not os.path.exists(folder_path):
 		os.makedirs(folder_path)
@@ -53,9 +53,11 @@ if __name__ == '__main__':
 		count = max(file_names)
 
 	print 'Capturing positive training images.'
-	print 'Press button or type c (and press enter) to capture an image.'
-	print 'Press Ctrl-C to quit.'
+	#print 'Press button or type c (and press enter) to capture an image.'
+	print 'Press q (and enter) to quit.'
 	while True:
+		if is_letter_input('q'):
+			break
 		# Check if button was pressed or 'c' was received, then capture image.
 		#if box.is_button_up() or is_letter_input('c'):
 		print 'Capturing image...'
@@ -78,5 +80,5 @@ if __name__ == '__main__':
 
                 cv2.imshow('Frame', image)
                 cv2.waitKey(1) & 0xFF
-
+	print 'done'
 		
