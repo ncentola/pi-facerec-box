@@ -66,7 +66,7 @@ if __name__ == '__main__':
 	dir_id = 0
 	id_name_lookup = []	
 	
-	engine = create_engine('postgres://pi@localhost:5432/pi')	
+	engine = create_engine('postgresql://root@localhost:5432/pi')	
 	#query to find all people not already in users
 	if engine.dialect.has_table(engine, 'users'):
 		users = pd.read_sql('users', engine)	

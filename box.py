@@ -20,7 +20,7 @@ if __name__ == '__main__':
 	camera = config.get_camera()
 	
 	# read in users lookup table
-	engine = create_engine('postgres://pi@localhost:5432/pi')
+	engine = create_engine('postgresql://root@localhost:5432/pi')
 	users = pd.read_sql('users', engine)
 
 	while True:
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 				## Test face against model.
 				id, confidence = model.predict(crop)
 				name = 'not working'
-				name = users['name'].loc[users['id'] == id]
+				name = str(users['name'].loc[users['id'] == id][1])
 				
 				cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
 				cv2.putText(image, name, (x, y+h+20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 2)
