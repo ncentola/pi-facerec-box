@@ -5,8 +5,7 @@ Copyright 2013 Tony DiCola
 import time
 
 import cv2
-import RPIO
-from RPIO import PWM
+import RPi.GPIO as GPIO
 
 import picam
 import config
@@ -17,12 +16,20 @@ class Box(object):
 	"""Class to represent the state and encapsulate access to the hardware of 
 	the treasure box."""
 	def __init__(self):
+		GPIO.setmode(GPIO.BCM)
+
+		GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+		GPIO.setup(22, GPIO.OUT)
+
+		p = GPIO.PWM(22, 50)
+		p.start(7.5)
+		
 		# Initialize lock servo and button.
-		self.servo = PWM.Servo()
-		RPIO.setup(config.BUTTON_PIN, RPIO.IN)
+		#self.servo = PWM.Servo()
+		#RPIO.setup(config.BUTTON_PIN, RPIO.IN)
 		# Set initial box state.
-		self.button_state = RPIO.input(config.BUTTON_PIN)
-		self.is_locked = None
+		self.button_state = GPIO.input(config.BUTTON_PIN)
+		#self.is_locked = None
 
 	def lock(self):
 		"""Lock the box."""
