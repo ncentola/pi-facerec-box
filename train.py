@@ -70,20 +70,20 @@ if __name__ == '__main__':
 	#query to find all people not already in users
 	if engine.dialect.has_table(engine, 'users'):
 		users = pd.read_sql('users', engine)	
-		dir_id = users['id'].max() + 1
+		dir_id = users['user_id'].max() + 1
 		user_names = list(pd.Series(users['name']))
 	else:
 		dir_id = 0
 		user_names = []
 		dummy_data = [(9999, 'blah', 0)]
-		users = pd.DataFrame.from_records(dummy_data, columns = ['id', 'name', 'created_at'])
+		users = pd.DataFrame.from_records(dummy_data, columns = ['user_id', 'name', 'created_at'])
 
 	# Read all faces
 	for root, dirs, files in os.walk(config.FACES_DIR):
 		for dir in dirs:
 			if dir in user_names:
 				print 'test'
-				existing_id = int(users['id'].loc[users['name'] == dir])
+				existing_id = int(users['user_id'].loc[users['name'] == dir])
 				id_name_lookup.append((existing_id, dir, datetime.datetime.now()))
 				for file in os.listdir(os.path.join(root, dir)):
                                 	filename = os.path.join(root, dir, file)
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 				dir_id = dir_id + 1
 	
 
-	df = pd.DataFrame.from_records(id_name_lookup, columns = ['id', 'name', 'created_at'])
+	df = pd.DataFrame.from_records(id_name_lookup, columns = ['user_id', 'name', 'created_at'])
 	df_new = df.loc[~df['name'].isin(users['name'])]
 	print 'Writing ' + str(len(df_new.index)) + ' rows.'
 	df_new.to_sql('users', engine, if_exists = 'append')
