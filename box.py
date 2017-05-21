@@ -33,9 +33,9 @@ def dispense(name):
         #GPIO.output(22, 0)
         #time.sleep(2)
         pi.set_servo_pulsewidth(22, 1000)
-        time.sleep(0.5) # sleep 1 second
-        pi.set_servo_pulsewidth(22, 1500)
-        time.sleep(0.5) # sleep 1 second
+        time.sleep(0.25) # sleep 1 second
+        pi.set_servo_pulsewidth(22, 2000)
+        time.sleep(0.25) # sleep 1 second
 
 def is_button_pressed():
 	return GPIO.input(18)
@@ -62,9 +62,10 @@ if __name__ == '__main__':
 		
 			# Get coordinates of single face in captured image.
 			faces = face.detect_face(image, single = False)
-		
+			pi.write(25, 1)
 			if faces is not None:
-                        	for (x, y, w, h) in faces:
+                        	pi.write(25, 0)
+				for (x, y, w, h) in faces:
                                 	cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
 
 
