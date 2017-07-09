@@ -40,6 +40,14 @@ def dispense(name):
 def is_button_pressed():
 	return GPIO.input(18)
 
+def standby_lights(i):
+	if i:
+		pi.write(23, 1)
+		pi.write(24, 0)
+	else:
+		pi.write(23, 0)
+		pi.write(24, 1)
+
 if __name__ == '__main__':
 	# Load training data into model
 	print 'Loading training data...'
@@ -53,7 +61,8 @@ if __name__ == '__main__':
 	# read in users lookup table
 	engine = create_engine('postgresql://root@localhost:5432/pi')
 	users = pd.read_sql('users', engine)
-
+	
+	i = True
 	while True:
 		try:
 			image = camera.read()
@@ -62,7 +71,7 @@ if __name__ == '__main__':
 		
 			# Get coordinates of single face in captured image.
 			faces = face.detect_face(image, single = False)
-			pi.write(25, 1)
+			standby_lights(i)
 			if faces is not None:
                         	pi.write(25, 0)
 				for (x, y, w, h) in faces:
@@ -99,6 +108,11 @@ if __name__ == '__main__':
 				
                 	cv2.imshow('Frame', image)
                 	cv2.waitKey(1) & 0xFF
+			
+			i =  not i
+			#if i > 20:
+				#i = 0
+			print i
 
 		except KeyboardInterrupt:
 			pi.stop()
