@@ -12,33 +12,56 @@ import pigpio
 import RPi.GPIO as GPIO
 import time
 import datetime
+import random
 
 GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #GPIO.setup(22, GPIO.OUT)
 pi = pigpio.pi()
 #p = GPIO.PWM(22, 50)
 #p.start(7.5)
 
-def log(engine, user_id, confidence):
-	row = [(user_id, confidence, datetime.datetime.now())]
-	df = pd.DataFrame.from_records(row, columns = ['user_id', 'confidence', 'created_at'])
+def log(user_id, confidence, motor, engine):
+	row = [(user_id, confidence, motor, datetime.datetime.now())]
+	df = pd.DataFrame.from_records(row, columns = ['user_id', 'confidence', 'motor',  'created_at'])
 	df.to_sql('activity', engine, if_exists = 'append')
 	
-def dispense(name):
+def dispense(name, user_id, confidence, engine):
         print 'Dispensing for ' + name
-        #GPIO.output(22, 1)
-        #time.sleep(0.0015)
-        #GPIO.output(22, 0)
-        #time.sleep(2)
-        pi.set_servo_pulsewidth(22, 1000)
-        time.sleep(0.25) # sleep 1 second
-        pi.set_servo_pulsewidth(22, 2000)
-        time.sleep(0.25) # sleep 1 second
+	
+	if random.uniform(0, 1.0) < 1:
+		#for i in range(1, 5):
+                #        pi.set_servo_pulsewidth(22, 500)
+                #        time.sleep(.05)
+                #        pi.set_servo_pulsewidth(22, 2000)
+                #        time.sleep(.05)
 
+                pi.set_servo_pulsewidth(22, 1800)
+                time.sleep(0.3)
+                pi.set_servo_pulsewidth(22, 1000)
+		log(user_id, confidence, 1, engine)
+
+        else:
+		for i in range(1, 5):
+                        pi.set_servo_pulsewidth(22, 500)
+                        time.sleep(.05)
+                        pi.set_servo_pulsewidth(22, 2000)
+                        time.sleep(.05)
+                pi.set_servo_pulsewidth(27, 1000)
+                time.sleep(0.5)
+                pi.set_servo_pulsewidth(27, 0)
+		log(user_id, confidence, 1, engine)
+
+	pi.set_servo_pulsewidth(22, 0)
+	pi.set_servo_pulsewidth(27, 0)
+	
 def is_button_pressed():
-	return GPIO.input(18)
+	input_state = GPIO.input(17) and GPIO.input(18)
+	pi.write(17, 1)
+	pi.write(18, 1)
+	return input_state
 
 def standby_lights(i):
 	if i:
@@ -71,15 +94,18 @@ if __name__ == '__main__':
 		
 			# Get coordinates of single face in captured image.
 			faces = face.detect_face(image, single = False)
-			standby_lights(i)
-			if faces is not None:
-                        	pi.write(25, 0)
-				for (x, y, w, h) in faces:
-                                	cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
-
-
-			if faces is not None:
+			#standby_lights(i)
+			pi.write(23, 0)
+			pi.write(24, 0)
 			
+			if faces is not None:
+				for (x, y, w, h) in faces:
+                               		cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
+
+
+			if faces is not None:
+				pi.write(23, 1)
+				pi.write(24, 1)
 				for facez in faces:
 					x, y, w, h = facez
 					
@@ -90,29 +116,25 @@ if __name__ == '__main__':
 					user_id, confidence = model.predict(crop)
 				
 					name = users['name'].loc[users['user_id'] == user_id]
-					print name
-					print type(name)
+					
 					name = str(name)
 					#print name.at[0,1]
 					cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0))
 					cv2.putText(image, name, (x, y+h+20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 2)
 				
-					print(is_button_pressed())
+					
 					if not is_button_pressed():
-						log(engine, user_id, confidence)
-						dispense(name)
+						#log(engine, user_id, confidence)
+						dispense(name, user_id, confidence, engine)
 						
 
 					print name
 					print confidence
 				
-                	cv2.imshow('Frame', image)
-                	cv2.waitKey(1) & 0xFF
+                	#cv2.imshow('Frame', image)
+                	#cv2.waitKey(1) & 0xFF
 			
 			i =  not i
-			#if i > 20:
-				#i = 0
-			print i
 
 		except KeyboardInterrupt:
 			pi.stop()
