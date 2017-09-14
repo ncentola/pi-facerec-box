@@ -43,15 +43,15 @@ NEGATIVE_LABEL = 2
 
 # Size (in pixels) to resize images for training and prediction.
 # Don't change this unless you also change the size of the training images.
-FACE_WIDTH  = 45
-FACE_HEIGHT = 56
+FACE_WIDTH  = 92
+FACE_HEIGHT = 112
 
 # Face detection cascade classifier configuration.
 # You don't need to modify this unless you know what you're doing.
 # See: http://docs.opencv.org/modules/objdetect/doc/cascade_classification.html
 HAAR_FACES         = 'haarcascade_frontalface_alt.xml'
-HAAR_SCALE_FACTOR  = 1.05
-HAAR_MIN_NEIGHBORS = 2
+HAAR_SCALE_FACTOR  = 1.25
+HAAR_MIN_NEIGHBORS = 4
 HAAR_MIN_SIZE      = (30, 30)
 
 # Filename to use when saving the most recently captured image for debugging.
