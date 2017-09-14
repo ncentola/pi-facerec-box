@@ -7,7 +7,7 @@ single image from the pi camera as an OpenCV image.
 """
 import io
 import time
-
+from fractions import Fraction
 import cv2
 import numpy as np
 import picamera
@@ -25,8 +25,15 @@ class OpenCVCapture(object):
 		# Capture a frame from the camera.
 		data = io.BytesIO()
 		with picamera.PiCamera() as camera:
-			camera.resolution = (92, 112)
+			camera.resolution = (480, 480)
 			camera.capture(data, format='jpeg')
+			camera.brightness = 100
+			camera.awb_mode = 'off'
+			camera.exposure_mode = 'night'
+			camera.meter_mode = 'spot'
+			camera.contrast = -100
+			
+
 		data = np.fromstring(data.getvalue(), dtype=np.uint8)
 		# Decode the image data and return an OpenCV image.
 		image = cv2.imdecode(data, 1)
