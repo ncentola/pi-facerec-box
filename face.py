@@ -29,6 +29,26 @@ def detect_face(image, single = False):
 			return faces
 	return None
 
+haar_smile = cv2.CascadeClassifier('haarcascade_smile.xml')
+
+def detect_smile(image, single = False):
+        """Return bounds (x, y, width, height) of detected face in grayscale im$
+           If no face or more than one face are detected, None is returned.
+        """
+        faces = haar_smile.detectMultiScale(image,
+                                scaleFactor=config.HAAR_SCALE_FACTOR,
+                                minNeighbors=config.HAAR_MIN_NEIGHBORS,
+                                minSize=config.HAAR_MIN_SIZE,
+                                flags=cv2.CASCADE_SCALE_IMAGE)
+        #print 'detect faces'
+        if len(faces) >= 1:
+                if single:
+                        return faces[0]
+                else:
+                        return faces
+        return None
+
+
 def crop(image, x, y, w, h):
 	"""Crop box defined by x, y (upper left corner) and w, h (width and height)
 	to an image with the same aspect ratio as the face training data.  Might
